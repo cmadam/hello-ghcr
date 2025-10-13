@@ -60,4 +60,4 @@ jobs:
 
     # --- Print pushed version ---
     - name: Show pushed image tag
-      run: echo "Pushed version: ${{ steps.bump.outputs.version }}"
+      run: echo "Pushed version ${{ steps.bump.outputs.version }}"
