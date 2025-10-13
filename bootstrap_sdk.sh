@@ -1,3 +1,3 @@
-#!/bin/hash
+#!/bin/bash
 
 python app.py
