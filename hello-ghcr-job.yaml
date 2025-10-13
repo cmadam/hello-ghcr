@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello-ghcr-job
+  labels:
+    app: hello-ghcr
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: hello-ghcr
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: hello-ghcr
+        image: ghcr.io/cmadam/hello-ghcr:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+      imagePullSecrets:
+      - name: ghcr-secret

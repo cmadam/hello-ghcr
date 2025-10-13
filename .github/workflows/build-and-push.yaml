@@ -1,4 +1,4 @@
-name: Build and Push Docker Image to GHCR
+name: Build and Push Auto-Versioned Image
 
 on:
   push:
@@ -8,45 +8,56 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Log in to GitHub Container Registry
+    # --- Read and increment version ---
+    - name: Increment version
+      id: bump
+      run: |
+        VERSION_FILE=version.txt
+        CURRENT_VERSION=$(cat $VERSION_FILE)
+        echo "Current version: $CURRENT_VERSION"
+
+        IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+        NEW_VERSION="$major.$minor.$((patch + 1))"
+        echo "$NEW_VERSION" > $VERSION_FILE
+        echo "New version: $NEW_VERSION"
+
+        echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+    # --- Commit updated version.txt ---
+    - name: Commit updated version
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git add version.txt
+        git commit -m "Bump version to ${{ steps.bump.outputs.version }}"
+        git push
+
+    # --- Log in to GHCR ---
+    - name: Log in to GHCR
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and push Docker image
+    # --- Build and push Docker image ---
+    - name: Build and push image
       uses: docker/build-push-action@v6
       with:
         push: true
-        tags: ghcr.io/${{ github.repository_owner }}/hello-ghcr:latest
+        tags: |
+          ghcr.io/${{ github.repository_owner }}/hello-ghcr:latest
+          ghcr.io/${{ github.repository_owner }}/hello-ghcr:${{ steps.bump.outputs.version }}
 
-    - name: Create Docker config JSON secret
-      run: |
-        mkdir -p output
-        cat <<EOF > output/ghcr-secret.json
-        {
-          "auths": {
-            "ghcr.io": {
-              "username": "${{ github.actor }}",
-              "password": "${{ secrets.GITHUB_TOKEN }}",
-              "email": "cmadam@us.ibm.com",
-              "auth": "$(echo -n "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" | base64)"
-            }
-          }
-        }
-        EOF
-        echo "Secret saved to output/ghcr-secret.json"
-
-    - name: Upload GHCR secret JSON
-      uses: actions/upload-artifact@v4
-      with:
-        name: ghcr-secret
-        path: output/ghcr-secret.json
+    # --- Print pushed version ---
+    - name: Show pushed image tag
+      run: echo "Pushed version: ${{ steps.bump.outputs.version }}"
