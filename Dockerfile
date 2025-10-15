@@ -2,7 +2,7 @@
 FROM python:3.12-slim
 
 WORKDIR /app
-COPY app.py .
+COPY hello_world.py .
 COPY bootstrap_sdk.sh .
 
-CMD ["python", "app.py"]
+CMD ["python", "hello_world.py"]
