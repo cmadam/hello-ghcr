@@ -44,20 +44,15 @@ if __name__ == "__main__":
     logging.info("The model used by this build is located at %s", args.model_location)
     logging.info("The output folder of this build is at %s", args.output_custom_path)
 
+    output_path = args.output_custom_path
+    assert isinstance(output_path, str) and output_path, "Invalid output path"
+    os.makedirs(name=output_path, exist_ok=True)
+
     for i in range(120):
         logging.info("Example demonstrating how to bring your own image in a workflow.")
         time.sleep(5)
         if i % 10 == 0:
-            filename = os.path.join(args.output_custom_path, f"artifact_{i}.txt")
-            with open(filename, "w") as fp:
+            file_path = os.path.join(args.output_custom_path, f"artifact_{i}.txt")
+            with open(file_path, "w") as fp:
                 fp.write(f"This is artifact {i}\n")
-            dct = {
-                "gb_step_id": "67a3bfcd-cbc6-49fe-908c-f52ea5f7242e",
-                "gb_build_id": "0abd12c2-c89f-4681-8477-5499d50d37cf",
-                "gb_step_name": "merge_model",
-                "gb_progress": {"progress": 0},
-                "gb_status": "running",
-                "gb_data_ready": {filename: "path"},
-                "gb_new_artifact": {"path": filename}
-            }
-            logging.info(json.dumps(dct))
+            logging.info("LLMB_ARTIFACT_ID:%s LLMB_ARTIFACT_PATH:%s", "output_1", file_path)
