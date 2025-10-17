@@ -50,9 +50,9 @@ if __name__ == "__main__":
 
     for i in range(120):
         logging.info("Example demonstrating how to bring your own image in a workflow.")
-        time.sleep(5)
+        time.sleep(0.5)
         if i % 10 == 0:
-            file_path = os.path.join(args.output_custom_path, f"artifact_{i}.txt")
+            file_path = os.path.join(output_path, f"artifact_{i}.txt")
             with open(file_path, "w") as fp:
                 fp.write(f"This is artifact {i}\n")
-            logging.info("LLMB_ARTIFACT_ID:%s LLMB_ARTIFACT_PATH:%s", "output_1", file_path)
+    logging.info("LLMB_ARTIFACT_ID:%s LLMB_ARTIFACT_PATH:%s", "output_1", output_path)
