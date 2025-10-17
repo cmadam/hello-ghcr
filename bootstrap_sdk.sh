@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python hello_world.py
+python hello_world.py "$@"
