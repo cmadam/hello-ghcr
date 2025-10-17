@@ -23,19 +23,19 @@ if __name__ == "__main__":
     parser.add_argument(
         "--fileset-location",
         type=str,
-        required=True,
+        required=False,
         help="The name of the fileset used by this build",
     )
     parser.add_argument(
         "--model-location",
         type=str,
-        required=True,
+        required=False,
         help="The name of the model used by this build",
     )
     parser.add_argument(
         "--output-custom-path",
         type=str,
-        required=True,
+        required=False,
         help="The name of the output path used by this build",
     )
     args = parser.parse_args()
