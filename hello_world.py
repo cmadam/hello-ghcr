@@ -8,14 +8,6 @@ import time
 """A simple logger that prints 120 times a message every 5 seconds."""
 
 
-# start_command:
-#   "/app/bootstrap_sdk.sh
-#      --fileset-location {{ bindings.input_artifact_path.binding.path }}
-#      --model-location {{ bindings.model_to_use.binding.path }}
-#      --output-custom-path {{ bindings.custom.binding.path }}
-#      --blah blah
-
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
 if __name__ == "__main__":
@@ -33,7 +25,7 @@ if __name__ == "__main__":
         help="The name of the model used by this build",
     )
     parser.add_argument(
-        "--output-custom-path",
+        "--output-path",
         type=str,
         required=False,
         help="The name of the output path used by this build",
@@ -42,9 +34,9 @@ if __name__ == "__main__":
 
     logging.info("The fileset used by this build is located at %s", args.fileset_location)
     logging.info("The model used by this build is located at %s", args.model_location)
-    logging.info("The output folder of this build is at %s", args.output_custom_path)
+    logging.info("The output folder of this build is at %s", args.output_path)
 
-    output_path = args.output_custom_path
+    output_path = args.output_path
     assert isinstance(output_path, str) and output_path, "Invalid output path"
     os.makedirs(name=output_path, exist_ok=True)
 
