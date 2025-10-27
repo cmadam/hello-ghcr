@@ -1,5 +1,4 @@
 import argparse
-import json
 import logging
 import os
 import sys
@@ -30,8 +29,15 @@ if __name__ == "__main__":
         required=False,
         help="The name of the output path used by this build",
     )
-    args = parser.parse_args()
+    parser.add_argument(
+        "--simulate-failure",
+        action="store_true",
+        required=False,
+        help="Simulate a failure",
+    )
 
+    args = parser.parse_args()
+    normal_run: bool = args.simulate_failure is None
     logging.info("The fileset used by this build is located at %s", args.fileset_location)
     logging.info("The model used by this build is located at %s", args.model_location)
     logging.info("The output folder of this build is at %s", args.output_path)
@@ -43,8 +49,12 @@ if __name__ == "__main__":
     for i in range(120):
         logging.info("Example demonstrating how to bring your own image in a workflow.")
         time.sleep(0.5)
-        if i % 10 == 0:
+        if i % 10 == 0 and normal_run:
             file_path = os.path.join(output_path, f"artifact_{i}.txt")
             with open(file_path, "w") as fp:
                 fp.write(f"This is artifact {i}\n")
-    logging.info("LLMB_ARTIFACT_ID:%s LLMB_ARTIFACT_PATH:%s", "output_1", output_path)
+    if normal_run:
+        logging.info("LLMB_ARTIFACT_ID:%s LLMB_ARTIFACT_PATH:%s", "output_1", output_path)
+    else:
+        logging.error("A simulated error occurred")
+        sys.exit(1)
