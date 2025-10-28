@@ -1,5 +1,5 @@
 # Use a minimal Python base image
-FROM python:3.12-slim
+FROM nvidia/cuda:12.8.0-cudnn-runtime-ubi9
 
 WORKDIR /app1
 COPY hello_world.py .
