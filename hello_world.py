@@ -37,14 +37,16 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    normal_run: bool = args.simulate_failure is None
+    normal_run: bool = (args.simulate_failure is None or args.simulate_failure == False)
     logging.info("The fileset used by this build is located at %s", args.fileset_location)
     logging.info("The model used by this build is located at %s", args.model_location)
     logging.info("The output folder of this build is at %s", args.output_path)
 
     output_path = args.output_path
-    assert isinstance(output_path, str) and output_path, "Invalid output path"
-    os.makedirs(name=output_path, exist_ok=True)
+    save_output_artifacts: bool = isinstance(output_path, str) and output_path
+
+    if save_output_artifacts:
+        os.makedirs(name=output_path, exist_ok=True)
 
     num_iterations = int(os.getenv("NUMBER_OF_ITERATIONS", "120"))
     sleep_interval = float(os.getenv("SLEEP_INTERVAL", "0.5"))
@@ -54,11 +56,13 @@ if __name__ == "__main__":
         logging.info("Example demonstrating how to bring your own image in a workflow.")
         time.sleep(sleep_interval)
         if i % 10 == 0 and normal_run:
-            file_path = os.path.join(output_path, f"artifact_{i}.txt")
-            with open(file_path, "w") as fp:
-                fp.write(f"This is artifact {i}\n")
+            if save_output_artifacts:
+                file_path = os.path.join(output_path, f"artifact_{i}.txt")
+                with open(file_path, "w") as fp:
+                    fp.write(f"This is artifact {i}\n")
     if normal_run:
-        logging.info("LLMB_ARTIFACT_ID:%s LLMB_ARTIFACT_PATH:%s", "output_1", output_path)
+        if save_output_artifacts:
+            logging.info("LLMB_ARTIFACT_ID:%s LLMB_ARTIFACT_PATH:%s", "output_1", output_path)
     else:
         logging.error("A simulated error occurred")
         sys.exit(1)
