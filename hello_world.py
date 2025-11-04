@@ -46,9 +46,13 @@ if __name__ == "__main__":
     assert isinstance(output_path, str) and output_path, "Invalid output path"
     os.makedirs(name=output_path, exist_ok=True)
 
-    for i in range(120):
+    num_iterations = int(os.getenv("NUMBER_OF_ITERATIONS", "120"))
+    sleep_interval = float(os.getenv("SLEEP_INTERVAL", "0.5"))
+    logging.info("Iterating %d times; sleep interval = %f seconds", num_iterations, sleep_interval)
+
+    for i in range(num_iterations):
         logging.info("Example demonstrating how to bring your own image in a workflow.")
-        time.sleep(0.5)
+        time.sleep(sleep_interval)
         if i % 10 == 0 and normal_run:
             file_path = os.path.join(output_path, f"artifact_{i}.txt")
             with open(file_path, "w") as fp:
