@@ -30,6 +30,12 @@ if __name__ == "__main__":
         help="The name of the output path used by this build",
     )
     parser.add_argument(
+        "--simulate-blackbox",
+        action="store_true",
+        required=False,
+        help="Simulate a blackbox image that can't be modified to print any logs",
+    )
+    parser.add_argument(
         "--simulate-failure",
         action="store_true",
         required=False,
@@ -37,6 +43,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+    print_logs: bool = (args.simulate_blackbox is None or args.simulate_blackbox == False)
     normal_run: bool = (args.simulate_failure is None or args.simulate_failure == False)
     logging.info("The fileset used by this build is located at %s", args.fileset_location)
     logging.info("The model used by this build is located at %s", args.model_location)
@@ -61,7 +68,7 @@ if __name__ == "__main__":
                 with open(file_path, "w") as fp:
                     fp.write(f"This is artifact {i}\n")
     if normal_run:
-        if save_output_artifacts:
+        if save_output_artifacts and print_logs:
             logging.info("LLMB_ARTIFACT_ID:%s LLMB_ARTIFACT_PATH:%s", "output_1", output_path)
     else:
         logging.error("A simulated error occurred")
